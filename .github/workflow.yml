@@ -1,0 +1,21 @@
+name: WhatsApp Notification on Issue Comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  notify-whatsapp:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Send WhatsApp Notification
+        run: |
+          curl -X POST https://api.twilio.com/2010-04-01/Accounts/${{ secrets.TWILIO_ACCOUNT_SID }}/Messages.json \
+            --data-urlencode "Body=New comment on issue: ${{ github.event.issue.title }}" \
+            --data-urlencode "From=whatsapp:+14155238886" \  # Twilio WhatsApp number
+            --data-urlencode "To=whatsapp:${{ secrets.WHATSAPP_NUMBER }}" \
+            -u ${{ secrets.TWILIO_ACCOUNT_SID }}:${{ secrets.TWILIO_AUTH_TOKEN }}
